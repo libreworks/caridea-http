@@ -42,9 +42,9 @@ class PaginationFactory
 
 	private static $RANGE = '/^items=(\\d+)-(\\d+)$/';
 	private static $DOJO_SORT = '/^sort\\((.*)\\)$/';
-	private static $MAX_ALIAS = [self::MAX, self::LIMIT, self::COUNT];
-	private static $OFFSET_ALIAS = [self::START, self::OFFSET];
-	private static $PAGE_ALIAS = [self::PAGE, self::START_PAGE];
+	private static $MAX_ALIAS = [self::MAX => null, self::LIMIT => null, self::COUNT => null];
+	private static $OFFSET_ALIAS = [self::START => null, self::OFFSET => null];
+	private static $PAGE_ALIAS = [self::PAGE => null, self::START_PAGE => null];
 	
     /**
      * Checks the request query parameters and headers for pagination info.
@@ -83,7 +83,6 @@ class PaginationFactory
 		$max = PHP_INT_MAX;
 		
 		$params = $request->getQueryParams();
-		
 		$range = $request->getHeaderLine(self::HEADER_RANGE);
         
 		if (preg_match(self::$RANGE, $range, $rm)) {
@@ -99,15 +98,16 @@ class PaginationFactory
 			$offVal = self::parse(self::$OFFSET_ALIAS, $params, 0);
 			if ($offVal > 0) {
 				$offset = $offVal;
-			}
-			if (isset($params[self::START_INDEX]) || isset($params[self::START_PAGE]) || isset($params[self::PAGE])) {
+			} else if (isset($params[self::START_INDEX])) {
 			// OpenSearch style, 1-based
 				$startIdx = isset($params[self::START_INDEX]) ? (int)$params[self::START_INDEX] : 0;
-			// OpenSearch or Spring Data style, 1-based
-				$startPage = self::parse(self::$PAGE_ALIAS, $params, 0);
 				if ($startIdx > 0) {
 					$offset = $startIdx - 1;
-				} else if ($startPage > 0) {
+                }
+            } else if (isset($params[self::START_PAGE]) || isset($params[self::PAGE])) {
+			// OpenSearch or Spring Data style, 1-based
+				$startPage = self::parse(self::$PAGE_ALIAS, $params, 0);
+				if ($startPage > 0) {
 					$offset = ($max * ($startPage - 1));
 				}
 			}				
@@ -125,8 +125,8 @@ class PaginationFactory
 			// stupid Grails ordering
 				$order[$params[$sortParameter]] = strcasecmp(self::DESC, $params[self::ORDER]) !== 0;
 			} else {
-                $values = $this->getExplodedParams($request)[$sortParameter];
-                foreach ($values as $s) {
+                $qparams = new QueryParams($request->getUri());
+                foreach ($qparams->get($sortParameter) as $s) {
                     self::parseSort($s, $order);
                 }
 			}
@@ -140,26 +140,8 @@ class PaginationFactory
 		}
         return $order;
     }
-    
-    private function getExplodedParams(\Psr\Http\Message\ServerRequestInterface $request)
-    {
-        $query = $request->getUri()->getQuery();
-        $explodedParams = [];
-        // in case of multiple query string params with the same name
-        // account for both param=foo&param=bar 
-        //         and also param[]=foo&param[]=bar
-        foreach (explode('&', $query) as $pair) {
-            list($name, $value) = explode('=', $pair, 2);  
-            $name = urldecode($name);
-            if (substr($name, -2, 2) == '[]') {
-                $name = substr($name, 0, strlen($name) - 2);
-            }
-            $explodedParams[$name][] = urldecode($value);
-        }        
-        return $explodedParams;
-    }
 	
-	private function parseSort($sort, &$sorts)
+	private static function parseSort($sort, &$sorts)
 	{
 		if (strlen(trim($sort)) === 0) {
 			return;
@@ -204,15 +186,19 @@ class PaginationFactory
 		}
 	}
 
+    /**
+     * Gets the first numeric value from `$params`, otherwise `$defaultValue`.
+     * 
+     * @param array $names
+     * @param array $params
+     * @param int $defaultValue
+     * @return int|null
+     */
 	private static function parse(array &$names, array &$params, $defaultValue)
 	{
-		foreach ($names as $name) {
-			$value = isset($params[$name]) ? $params[$name] : null;
-			$parsed = is_numeric($value) ? (int)$value : null;
-			if ($parsed !== null) {
-				return (int)$value;
-			}
-		}
-		return $defaultValue;
+        $value = array_reduce(array_intersect_key($params, $names), function($carry, $item){
+            return $carry !== null ? $carry : (is_numeric($item) ? (int)$item : null);
+        });
+        return $value === null ? $defaultValue : $value;
 	}
 }

@@ -227,4 +227,24 @@ class PaginationFactoryTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals(1, $p1->getOffset());
 		$this->assertEquals(["foo" => true], $p1->getOrder());
 	}
+    
+    public function testWeird()
+	{
+        $uri = $this->getMockForAbstractClass(\Psr\Http\Message\UriInterface::class, ['getQuery']);
+        $uri->expects($this->any())
+            ->method('getQuery')
+            ->willReturn('max=25&offset=1&sort=[foo]&sort=');
+        $request1 = $this->getMockForAbstractClass(\Psr\Http\Message\ServerRequestInterface::class, ['getQueryParams']);
+        $request1->expects($this->any())
+            ->method('getQueryParams')
+            ->willReturn(['max' => '25', 'offset' => '1', 'sort' => '[foo]', 'sort' => '']);
+        $request1->expects($this->any())
+            ->method('getUri')
+            ->willReturn($uri);
+		$p1 = $this->object->create($request1);
+		
+		$this->assertEquals(25, $p1->getMax());
+		$this->assertEquals(1, $p1->getOffset());
+		$this->assertEquals(["[foo]" => true], $p1->getOrder());
+	}
 }

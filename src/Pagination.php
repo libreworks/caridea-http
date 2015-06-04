@@ -50,23 +50,23 @@ class Pagination
      * 
      * @param int $max The max number of records to return. If zero or any negative number is provided, this defaults to `PHP_INT_MAX`
      * @param int $offset The offset in the records. If a negative number is provided, this defaults to `0`
-     * @param array $order Associative array of field names to boolean values (`true` = ascending, `false` = descending)
+     * @param array $order Associative array of field names to boolean values (`true` = ascending, `false` = descending). Any non-boolean value (`1` included) will evaluate as `false`.
      */
     public function __construct($max, $offset, $order = [])
     {
-        $this->max = (int)$max;
-        if ($max < 1) {
-            $this->max = PHP_INT_MAX;
-        }
-		$this->offset = (int)$offset;
-        if ($offset < 1) {
-            $this->offset = 0;
-        }
+        $this->max = $this->normalize($max, PHP_INT_MAX);
+		$this->offset = $this->normalize($offset, 0);
         foreach ($order as $k => $v) {
             if (strlen(trim($k)) !== 0) {
                 $this->order[$k] = $v === true;
             }
         }
+    }
+    
+    private function normalize($value, $default)
+    {
+        $v = (int)$value;
+        return $v < 1 ? $default : $v;
     }
     
     /**
