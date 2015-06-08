@@ -1,19 +1,19 @@
 <?php
 /**
  * Caridea
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- * 
+ *
  * @copyright 2015 LibreWorks contributors
  * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
  */
@@ -28,126 +28,166 @@ namespace Caridea\Http;
 class PaginationFactory
 {
     const DESC = "desc";
-	const SORT = "sort";
-	const ORDER = "order";
-	const PAGE = "page";
-	const START_PAGE = "startPage";
-	const START_INDEX = "startIndex";
-	const START = "start";
-	const COUNT = "count";
-	const MAX = "max";
-	const LIMIT = "limit";
-	const OFFSET = "offset";
-	const HEADER_RANGE = "Range";
-
-	private static $RANGE = '/^items=(\\d+)-(\\d+)$/';
-	private static $DOJO_SORT = '/^sort\\((.*)\\)$/';
-	private static $MAX_ALIAS = [self::MAX => null, self::LIMIT => null, self::COUNT => null];
-	private static $OFFSET_ALIAS = [self::START => null, self::OFFSET => null];
-	private static $PAGE_ALIAS = [self::PAGE => null, self::START_PAGE => null];
-	
+    const SORT = "sort";
+    const ORDER = "order";
+    const PAGE = "page";
+    const START_PAGE = "startPage";
+    const START_INDEX = "startIndex";
+    const START = "start";
+    const COUNT = "count";
+    const MAX = "max";
+    const LIMIT = "limit";
+    const OFFSET = "offset";
+    const RANGE = "Range";
+    const REGEX_RANGE = '/^items=(\\d+)-(\\d+)$/';
+    const REGEX_DOJO_SORT = '/^sort\\(.*\\)$/';
+    
+    private static $maxAlias = [self::MAX => null, self::LIMIT => null, self::COUNT => null];
+    private static $offsetAlias = [self::START => null, self::OFFSET => null];
+    private static $pageAlias = [self::PAGE => null, self::START_PAGE => null];
+    
     /**
      * Checks the request query parameters and headers for pagination info.
-     * 
+     *
      * This class supports a good size sampling of different ways to provide
-     * pagination info. 
-     * 
+     * pagination info.
+     *
      * #### Range
-	 * - `max` + `offset` (e.g. Grails): `&max=25&offset=0`
-	 * - `count` + `start` (e.g. `dojox.data.QueryReadStore`): `&count=25&start=0`
+     * - `max` + `offset` (e.g. Grails): `&max=25&offset=0`
+     * - `count` + `start` (e.g. `dojox.data.QueryReadStore`): `&count=25&start=0`
      * - `Range` header (e.g. `dojo.store.JsonRest`): `Range: items=0-24`
      * - `count` + `startIndex` (e.g. OpenSearch): `&count=25&startIndex=1`
      * - `count` + `startPage` (e.g. OpenSearch): `&count=25&startPage=1`
      * - `limit` + `page` (e.g. Spring Data REST): `&limit=25&page=1`
      * - `limit` + `start` (e.g. ExtJS): `&limit=25&start=0`
-     * 
+     *
      * Dojo, Grails, and ExtJS are all zero-based. OpenSearch and Spring Data
      * are one-based.
-     * 
+     *
      * #### Order
      * - OpenSearchServer: `&sort=foo&sort=-bar`
      * - OpenSearch extension: `&sort=foo:ascending&sort=bar:descending`
-	 * - Grails: `&sort=foo&order=asc`
-	 * - Spring Data REST: `&sort=foo,asc&sort=bar,desc`
+     * - Grails: `&sort=foo&order=asc`
+     * - Spring Data REST: `&sort=foo,asc&sort=bar,desc`
      * - Dojo: `&sort(+foo,-bar)`
-	 * - Dojo w/field: `&[field]=+foo,-bar`
+     * - Dojo w/field: `&[field]=+foo,-bar`
      * - ExtJS JSON: `&sort=[{"property":"foo","direction":"asc"},{"property":"bar","direction":"desc"}]`
-     * 
-     * @param \Psr\Http\Message\ServerRequestInterface $request The server request
+     *
+     * Because of the fact that many order syntaxes use multiple query string
+     * parameters with the same name, it is absolutely *vital* that you do not
+     * use a `ServerRequestInterface` that has been constructed with the `$_GET`
+     * superglobal.
+     *
+     * The problem here is that PHP will overwrite entries in the `$_GET`
+     * superglobal if they share the same name. With PHP, a request to
+     * `file.php?foobar=foo&foobar=bar` will result in `$_GET` set to
+     * `['foobar' => 'bar']`.
+     *
+     * Other platforms, like the Java Servlet specification, allow list-like
+     * access to these parameters. Make sure the object you pass for `$request`
+     * has a `queryParams` property that has been created to account for
+     * multiple query parameters with the same name. The `QueryParams` class
+     * will produce an array that accounts for this case.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request The server request. Please read important docs above.
      * @param string $sortParameter The name of the sort parameter
-     * @return \Caridea\Http\Pagination The pagination details 
+     * @return \Caridea\Http\Pagination The pagination details
      */
-	public function create(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter = self::SORT)
-	{
-		$offset = 0;
-		$max = PHP_INT_MAX;
-		
-		$params = $request->getQueryParams();
-		$range = $request->getHeaderLine(self::HEADER_RANGE);
-        
-		if (preg_match(self::$RANGE, $range, $rm)) {
-			// dojo.store.JsonRest style
-			$offset = (int)$rm[1];
-			$max = (int)$rm[2] - $offset + 1;
-		} else {
-			$maxVal = self::parse(self::$MAX_ALIAS, $params, PHP_INT_MAX);
-			if (PHP_INT_MAX != $maxVal) {
-				$max = $maxVal;
-			}
-			// Grails, ExtJS, dojox.data.QueryReadStore, all zero-based
-			$offVal = self::parse(self::$OFFSET_ALIAS, $params, 0);
-			if ($offVal > 0) {
-				$offset = $offVal;
-			} else if (isset($params[self::START_INDEX])) {
-			// OpenSearch style, 1-based
-				$startIdx = isset($params[self::START_INDEX]) ? (int)$params[self::START_INDEX] : 0;
-				if ($startIdx > 0) {
-					$offset = $startIdx - 1;
-                }
-            } else if (isset($params[self::START_PAGE]) || isset($params[self::PAGE])) {
-			// OpenSearch or Spring Data style, 1-based
-				$startPage = self::parse(self::$PAGE_ALIAS, $params, 0);
-				if ($startPage > 0) {
-					$offset = ($max * ($startPage - 1));
-				}
-			}				
-		}
-		
-		return new Pagination($max, $offset, $this->getOrder($request, $sortParameter));
-	}
-    
-    private function getOrder(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter)
+    public function create(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter = self::SORT)
     {
-		$order = [];
+        $offset = 0;
+        $max = PHP_INT_MAX;
+        
         $params = $request->getQueryParams();
-		if (isset($params[$sortParameter])) {
-			if (isset($params[self::ORDER])) {
-			// stupid Grails ordering
-				$order[$params[$sortParameter]] = strcasecmp(self::DESC, $params[self::ORDER]) !== 0;
-			} else {
-                $qparams = new QueryParams($request->getUri());
-                foreach ($qparams->get($sortParameter) as $s) {
-                    self::parseSort($s, $order);
+        $range = $request->getHeaderLine(self::RANGE);
+        
+        if (preg_match(self::REGEX_RANGE, $range, $rm)) {
+            // dojo.store.JsonRest style
+            $offset = (int)$rm[1];
+            $max = (int)$rm[2] - $offset + 1;
+        } else {
+            $max = $this->parse(self::$maxAlias, $params, PHP_INT_MAX);
+            // Grails, ExtJS, dojox.data.QueryReadStore, all zero-based
+            $offVal = $this->parse(self::$offsetAlias, $params, 0);
+            if ($offVal > 0) {
+                $offset = $offVal;
+            } elseif (isset($params[self::START_INDEX])) {
+            // OpenSearch style, 1-based
+                $startIdx = isset($params[self::START_INDEX]) ? (int)$params[self::START_INDEX] : 0;
+                if ($startIdx > 0) {
+                    $offset = $startIdx - 1;
                 }
-			}
-		} else {
-			foreach ($params as $s => $v) {
-				if (preg_match(self::$DOJO_SORT, $s, $sm)) {
-					// +foo,-bar
-					self::parseSort($sm[1], $order);
-				}
-			}
-		}
+            } elseif (isset($params[self::START_PAGE]) || isset($params[self::PAGE])) {
+            // OpenSearch or Spring Data style, 1-based
+                $startPage = $this->parse(self::$pageAlias, $params, 0);
+                if ($startPage > 0) {
+                    $offset = ($max * ($startPage - 1));
+                }
+            }
+        }
+        
+        return new Pagination($max, $offset, $this->getOrder($request, $sortParameter));
+    }
+    
+    /**
+     * Parses the order array.
+     * 
+     * Because of the fact that many order syntaxes use multiple query string
+     * parameters with the same name, it is absolutely *vital* that you do not
+     * use a `ServerRequestInterface` that has been constructed with the `$_GET`
+     * superglobal.
+     *
+     * The problem here is that PHP will overwrite entries in the `$_GET`
+     * superglobal if they share the same name. With PHP, a request to
+     * `file.php?foobar=foo&foobar=bar` will result in `$_GET` set to
+     * `['foobar' => 'bar']`.
+     *
+     * Other platforms, like the Java Servlet specification, allow list-like
+     * access to these parameters. Make sure the object you pass for `$request`
+     * has a `queryParams` property that has been created to account for
+     * multiple query parameters with the same name. The `QueryParams` class
+     * will produce an array that accounts for this case.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request The request
+     * @param string $sortParameter The sort parameter
+     * @return array String keys to boolean values
+     */
+    protected function getOrder(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter)
+    {
+        $order = [];
+        $params = $request->getQueryParams();
+        if (isset($params[$sortParameter])) {
+            if (isset($params[self::ORDER])) {
+            // stupid Grails ordering
+                $order[$params[$sortParameter]] = strcasecmp(self::DESC, $params[self::ORDER]) !== 0;
+            } else {
+                $param = $params[$sortParameter];
+                foreach ((is_array($param) ? $param : [$param]) as $s) {
+                    $this->parseSort($s, $order);
+                }
+            }
+        } else {
+            foreach (preg_grep(self::REGEX_DOJO_SORT, array_keys($params)) as $s) {
+                // sort(+foo,-bar)
+                $this->parseSort(substr($s, 5, -1), $order);
+            }
+        }
         return $order;
     }
-	
-	private static function parseSort($sort, &$sorts)
-	{
-		if (strlen(trim($sort)) === 0) {
-			return;
-		}
-		if (substr($sort, 0, 1) == "[") {
-			// it might be the ridiculous JSON ExtJS sort format
+    
+    /**
+     * Attempts to parse a single sort value.
+     * 
+     * @param string $sort The sort value
+     * @param array $sorts String keys to boolean values
+     */
+    protected function parseSort($sort, array &$sorts)
+    {
+        if (strlen(trim($sort)) === 0) {
+            return;
+        }
+        if (substr($sort, 0, 1) == "[") {
+            // it might be the ridiculous JSON ExtJS sort format
             $json = json_decode($sort);
             if (is_array($json)) {
                 foreach ($json as $s) {
@@ -157,48 +197,48 @@ class PaginationFactory
                 }
                 return;
             }
-		}
-		if (substr($sort, -4) == ",asc") {
-		// foo,asc
-			$sorts[substr($sort, 0, strlen($sort) - 4)] = true;
-		} else if (substr($sort, -5) == ",desc") {
-		// foo,desc
-			$sorts[substr($sort, 0, strlen($sort) - 5)] = false;
-		} else if (substr($sort, -10) == ":ascending") {
-		// foo:ascending
-			$sorts[substr($sort, 0, strlen($sort) - 10)] = true;
-		} else if (substr($sort, -11) == ":descending") {
-		// foo:descending
+        }
+        if (substr($sort, -4) == ",asc") {
+        // foo,asc
+            $sorts[substr($sort, 0, strlen($sort) - 4)] = true;
+        } elseif (substr($sort, -5) == ",desc") {
+        // foo,desc
+            $sorts[substr($sort, 0, strlen($sort) - 5)] = false;
+        } elseif (substr($sort, -10) == ":ascending") {
+        // foo:ascending
+            $sorts[substr($sort, 0, strlen($sort) - 10)] = true;
+        } elseif (substr($sort, -11) == ":descending") {
+        // foo:descending
             $sorts[substr($sort, 0, strlen($sort) - 11)] = false;
-		} else {
-			foreach (explode(',', $sort) as $s) {
-				if (substr($s, 0, 1) === '-') {
-				// -foo
+        } else {
+            foreach (explode(',', $sort) as $s) {
+                if (substr($s, 0, 1) === '-') {
+                // -foo
                     $sorts[substr($s, 1)] = false;
-				} else if (substr($s, 0, 1) === '+') {
-				// +foo
+                } elseif (substr($s, 0, 1) === '+') {
+                // +foo
                     $sorts[substr($s, 1)] = true;
-				} else {
-				// foo
+                } else {
+                // foo
                     $sorts[$s] = true;
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 
     /**
      * Gets the first numeric value from `$params`, otherwise `$defaultValue`.
-     * 
+     *
      * @param array $names
      * @param array $params
      * @param int $defaultValue
      * @return int|null
      */
-	private static function parse(array &$names, array &$params, $defaultValue)
-	{
-        $value = array_reduce(array_intersect_key($params, $names), function($carry, $item){
+    protected function parse(array &$names, array &$params, $defaultValue)
+    {
+        $value = array_reduce(array_intersect_key($params, $names), function ($carry, $item) {
             return $carry !== null ? $carry : (is_numeric($item) ? (int)$item : null);
         });
         return $value === null ? $defaultValue : $value;
-	}
+    }
 }

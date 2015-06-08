@@ -3,7 +3,7 @@
     "type": "library",
     "description": "A shrimp of an HTTP utility library",
     "keywords": ["http", "problem details"],
-    "version": "0.1.0",
+    "version": "0.2.0-dev",
     "homepage": "http://github.com/libreworks/caridea-http",
     "license": "Apache-2.0",
     "authors": [
