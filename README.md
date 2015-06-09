@@ -1,9 +1,9 @@
 # caridea-http
-Caridea is a miniscule PHP web application library. This shrimpy fellow is what you'd use when you just want some helping hands and not a full-blown framework.
+Caridea is a miniscule PHP application library. This shrimpy fellow is what you'd use when you just want some helping hands and not a full-blown framework.
 
 ![](http://libreworks.com/caridea-100.png)
 
-This is its HTTP component. It includes small utilities for working with [PSR-7](http://www.php-fig.org/psr/psr-7/)HTTP requests and responses, including:
+This is its HTTP component. It includes small utilities for working with [PSR-7](http://www.php-fig.org/psr/psr-7/) HTTP requests and responses, including:
 
 * An implementation of "[Problem Details for HTTP APIs](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00)".
 * A utility to parse common pagination parameters from the request
