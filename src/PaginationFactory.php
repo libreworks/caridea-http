@@ -131,7 +131,7 @@ class PaginationFactory
     
     /**
      * Parses the order array.
-     * 
+     *
      * Because of the fact that many order syntaxes use multiple query string
      * parameters with the same name, it is absolutely *vital* that you do not
      * use a `ServerRequestInterface` that has been constructed with the `$_GET`
@@ -177,7 +177,7 @@ class PaginationFactory
     
     /**
      * Attempts to parse a single sort value.
-     * 
+     *
      * @param string $sort The sort value
      * @param array $sorts String keys to boolean values
      */

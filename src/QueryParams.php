@@ -39,10 +39,10 @@ class QueryParams
 {
     /**
      * Parses the query string from the `QUERY_STRING` in the provided array.
-     * 
+     *
      * For the URL `file.php?test[]=1&test[]=2&noval&foobar=foo&foobar=bar&abc=123`,
      * the returned array will be:
-     * 
+     *
      * ```php
      * [
      *     'test' => ['1', '2'],
@@ -68,7 +68,7 @@ class QueryParams
                 }
             }
         }
-        return $params ? array_map(function ($v){
+        return $params ? array_map(function ($v) {
             return count($v) === 1 ? $v[0] : $v;
         }, $params) : $params;
     }
@@ -84,10 +84,10 @@ class QueryParams
     
     /**
      * Parses the query string from the `QUERY_STRING` in the `$_SERVER` superglobal.
-     * 
+     *
      * For the URL `file.php?test[]=1&test[]=2&noval&foobar=foo&foobar=bar&abc=123`,
      * the returned array will be:
-     * 
+     *
      * ```php
      * [
      *     'test' => ['1', '2'],

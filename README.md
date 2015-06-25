@@ -8,6 +8,7 @@ This is its HTTP component. It includes small utilities for working with [PSR-7]
 * An implementation of "[Problem Details for HTTP APIs](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00)".
 * A utility to parse common pagination parameters from the request
 * A utility to correctly parse query strings with multiple parameters having the same name
+* A utility to determine a client's preferred accepted MIME type
 
 ## Installation
 
@@ -46,7 +47,7 @@ $problem = new ProblemDetails(
         'auth' => 'foobar'
     ]
 );
-echo $problem->getJson();
+echo $problem->toJson();
 ```
 
 ### Pagination Factory
@@ -68,4 +69,12 @@ $pagination = $factory->create($request, 'sort');
 $pagination->getMax();    // 25
 $pagination->getOffset(); // 0
 $pagination->getOrder();  // ['foo' => true, 'bar' => false]
+```
+
+### Accept Types
+
+```php
+// say the HTTP_ACCEPT field is text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+$types = new \Caridea\Http\AcceptTypes($_SERVER);
+$types->preferred(['application/xml', 'application/json']); // returns application/xml
 ```
