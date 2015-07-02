@@ -107,6 +107,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      * @covers Caridea\Http\ProblemDetails::__construct
      * @covers Caridea\Http\ProblemDetails::toArray
      * @covers Caridea\Http\ProblemDetails::toJson
+     * @covers Caridea\Http\ProblemDetails::__toString
      */
     public function testGetExtensions()
     {
@@ -114,6 +115,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['foo' => 'bar', 'cloud_9' => 'great'], $object->getExtensions());
         $this->assertEquals(['type' => 'about:blank', 'foo' => 'bar', 'cloud_9' => 'great'], $object->toArray());
         $this->assertEquals('{"type":"about:blank","foo":"bar","cloud_9":"great"}', $object->toJson());
+        $this->assertEquals('{"type":"about:blank","foo":"bar","cloud_9":"great"}', (string)$object);
     }
 
     /**

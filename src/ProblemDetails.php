@@ -156,6 +156,16 @@ class ProblemDetails
     }
 
     /**
+     * Returns a JSON representation of this problem.
+     *
+     * @return string The JSON representation
+     */
+    public function __toString()
+    {
+        return $this->toJson();
+    }
+
+    /**
      * A JSON representation of this problem.
      *
      * @return string The JSON representation
@@ -164,7 +174,7 @@ class ProblemDetails
     {
         return json_encode($this->toArray());
     }
-    
+
     /**
      * Gets a serializable representation of this problem.
      *
