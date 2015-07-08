@@ -46,7 +46,7 @@ $problem = new ProblemDetails(
     500,                                         // status
     'It looks like the server has goofed again', // detail
     new Uri('http://example.com/problems/1f9a'), // instance
-    [                                            // detail
+    [                                            // extensions
         'server' => 'workerbee01.example.com',
         'auth' => 'foobar'
     ]
