@@ -10,6 +10,10 @@ This is its HTTP component. It includes small utilities for working with [PSR-7]
 * A utility to correctly parse query strings with multiple parameters having the same name
 * A utility to determine a client's preferred accepted MIME type
 
+[![Build Status](https://travis-ci.org/libreworks/caridea-http.svg)](https://travis-ci.org/libreworks/caridea-http)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
+
 ## Installation
 
 You can install this library using Composer:
