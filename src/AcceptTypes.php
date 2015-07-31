@@ -75,7 +75,7 @@ class AcceptTypes
      */
     public function preferred(array $types)
     {
-        if (!$types) {
+        if (empty($types)) {
             return null;
         }
         foreach ($this->types as $type) {

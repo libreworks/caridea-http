@@ -182,7 +182,7 @@ class ProblemDetails
      */
     public function toArray()
     {
-        if (!$this->output) {
+        if (empty($this->output)) {
             $problem = [
                 'type' => $this->type ? (string)$this->type : 'about:blank'
             ];
