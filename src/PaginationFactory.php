@@ -91,9 +91,10 @@ class PaginationFactory
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request The server request. Please read important docs above.
      * @param string $sortParameter The name of the sort parameter
+     * @param array<string,bool> $defaultSort The default sort if request lacks it
      * @return \Caridea\Http\Pagination The pagination details
      */
-    public function create(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter = self::SORT)
+    public function create(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter = self::SORT, array $defaultSort = [])
     {
         $offset = 0;
         $max = PHP_INT_MAX;
@@ -126,7 +127,7 @@ class PaginationFactory
             }
         }
         
-        return new Pagination($max, $offset, $this->getOrder($request, $sortParameter));
+        return new Pagination($max, $offset, $this->getOrder($request, $sortParameter, $defaultSort));
     }
     
     /**
@@ -150,9 +151,10 @@ class PaginationFactory
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request The request
      * @param string $sortParameter The sort parameter
+     * @param array $default The default sort order
      * @return array String keys to boolean values
      */
-    protected function getOrder(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter)
+    protected function getOrder(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter, array $default = [])
     {
         $order = [];
         $params = $request->getQueryParams();
@@ -172,7 +174,7 @@ class PaginationFactory
                 $this->parseSort(substr($s, 5, -1), $order);
             }
         }
-        return $order;
+        return empty($order) ? $default : $order;
     }
     
     /**
