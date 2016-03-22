@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * @copyright 2015 LibreWorks contributors
+ * @copyright 2015-2016 LibreWorks contributors
  * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
  */
 namespace Caridea\Http;
@@ -25,7 +25,7 @@ namespace Caridea\Http;
  * Unfortunately, the specific draft of the memo is expired as of March.
  * Hopefully a new version will be released soon.
  *
- * @copyright 2015 LibreWorks contributors
+ * @copyright 2015-2016 LibreWorks contributors
  * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
  * @see https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00
  */
