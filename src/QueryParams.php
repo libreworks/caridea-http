@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -52,9 +53,9 @@ class QueryParams
      * ];
      * ```
      *
-     * @param array $server The server values array
+     * @param array<string,mixed> $server The server values array
      */
-    public static function get(array $server)
+    public static function get(array $server): array
     {
         $params = [];
         if (isset($server['QUERY_STRING'])) {
@@ -73,7 +74,7 @@ class QueryParams
         }, $params) : $params;
     }
     
-    protected static function normalize(array $pair)
+    protected static function normalize(array $pair): array
     {
         $name = $pair[0];
         if (substr($name, -2, 2) == '[]') {
@@ -96,8 +97,9 @@ class QueryParams
      *     'abc' => '123'
      * ];
      * ```
+     * @return array<string,mixed> The query string values
      */
-    public static function getFromServer()
+    public static function getFromServer(): array
     {
         return self::get($_SERVER);
     }

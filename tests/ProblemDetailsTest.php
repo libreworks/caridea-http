@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -64,7 +65,8 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetStatus()
     {
-        $object = new ProblemDetails(null, null, '404');
+        $object = new ProblemDetails(null, null, 404);
+        $this->assertNull($object->getType());
         $this->assertSame(404, $object->getStatus());
         $this->assertEquals(['type' => 'about:blank', 'status' => 404], $object->toArray());
         $this->assertEquals('{"type":"about:blank","status":404}', $object->toJson());
@@ -78,7 +80,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetDetail()
     {
-        $object = new ProblemDetails(null, null, null, 'You should fix this');
+        $object = new ProblemDetails(null, null, 0, 'You should fix this');
         $this->assertSame('You should fix this', $object->getDetail());
         $this->assertEquals(['type' => 'about:blank', 'detail' => 'You should fix this'], $object->toArray());
         $this->assertEquals('{"type":"about:blank","detail":"You should fix this"}', $object->toJson());
@@ -96,7 +98,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
         $uri->expects($this->any())
             ->method('__toString')
             ->willReturn('http://example.com/foo');
-        $object = new ProblemDetails(null, null, null, null, $uri);
+        $object = new ProblemDetails(null, null, 0, null, $uri);
         $this->assertSame($uri, $object->getInstance());
         $this->assertEquals(['type' => 'about:blank', 'instance' => 'http://example.com/foo'], $object->toArray());
         $this->assertEquals('{"type":"about:blank","instance":"http:\/\/example.com\/foo"}', $object->toJson());
@@ -111,7 +113,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetExtensions()
     {
-        $object = new ProblemDetails(null, null, null, null, null, ['foo' => 'bar', 'cloud_9' => 'great']);
+        $object = new ProblemDetails(null, null, 0, null, null, ['foo' => 'bar', 'cloud_9' => 'great']);
         $this->assertEquals(['foo' => 'bar', 'cloud_9' => 'great'], $object->getExtensions());
         $this->assertEquals(['type' => 'about:blank', 'foo' => 'bar', 'cloud_9' => 'great'], $object->toArray());
         $this->assertEquals('{"type":"about:blank","foo":"bar","cloud_9":"great"}', $object->toJson());
@@ -125,7 +127,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadExtensions1()
     {
-        new ProblemDetails(null, null, null, null, null, ['status' => 'single']);
+        new ProblemDetails(null, null, 0, null, null, ['status' => 'single']);
     }
 
     /**
@@ -135,6 +137,6 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      */
     public function testBadExtensions2()
     {
-        new ProblemDetails(null, null, null, null, null, [911 => 'emergency']);
+        new ProblemDetails(null, null, 0, null, null, [911 => 'emergency']);
     }
 }

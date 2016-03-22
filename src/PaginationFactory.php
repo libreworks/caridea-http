@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -94,7 +95,7 @@ class PaginationFactory
      * @param array<string,bool> $defaultSort The default sort if request lacks it
      * @return \Caridea\Http\Pagination The pagination details
      */
-    public function create(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter = self::SORT, array $defaultSort = [])
+    public function create(\Psr\Http\Message\ServerRequestInterface $request, string $sortParameter = self::SORT, array $defaultSort = []): Pagination
     {
         $offset = 0;
         $max = PHP_INT_MAX;
@@ -102,7 +103,7 @@ class PaginationFactory
         $params = $request->getQueryParams();
         $range = $request->getHeaderLine(self::RANGE);
         
-        if (preg_match(self::REGEX_RANGE, $range, $rm)) {
+        if ($range !== null && preg_match(self::REGEX_RANGE, $range, $rm)) {
             // dojo.store.JsonRest style
             $offset = (int)$rm[1];
             $max = (int)$rm[2] - $offset + 1;
@@ -151,10 +152,10 @@ class PaginationFactory
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request The request
      * @param string $sortParameter The sort parameter
-     * @param array $default The default sort order
-     * @return array String keys to boolean values
+     * @param array<string,bool> $default The default sort order
+     * @return array<string,bool> String keys to boolean values
      */
-    protected function getOrder(\Psr\Http\Message\ServerRequestInterface $request, $sortParameter, array $default = [])
+    protected function getOrder(\Psr\Http\Message\ServerRequestInterface $request, string $sortParameter, array $default = []): array
     {
         $order = [];
         $params = $request->getQueryParams();
@@ -181,9 +182,9 @@ class PaginationFactory
      * Attempts to parse a single sort value.
      *
      * @param string $sort The sort value
-     * @param array $sorts String keys to boolean values
+     * @param array<string,bool> $sorts String keys to boolean values
      */
-    protected function parseSort($sort, array &$sorts)
+    protected function parseSort(string $sort, array &$sorts)
     {
         if (strlen(trim($sort)) === 0) {
             return;
@@ -234,9 +235,9 @@ class PaginationFactory
      * @param array $names
      * @param array $params
      * @param int $defaultValue
-     * @return int|null
+     * @return int
      */
-    protected function parse(array &$names, array &$params, $defaultValue)
+    protected function parse(array &$names, array &$params, int $defaultValue) : int
     {
         $value = array_reduce(array_intersect_key($params, $names), function ($carry, $item) {
             return $carry !== null ? $carry : (is_numeric($item) ? (int)$item : null);

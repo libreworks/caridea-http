@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -70,8 +71,8 @@ class AcceptTypes
      * $types->preferred([]);
      * ```
      *
-     * @param  array $types The MIME types to compare
-     * @return string The most preferred MIME type or null
+     * @param string[] $types The MIME types to compare
+     * @return string|null The most preferred MIME type or null
      */
     public function preferred(array $types)
     {

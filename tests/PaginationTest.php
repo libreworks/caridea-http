@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -29,7 +30,7 @@ class PaginationTest extends \PHPUnit_Framework_TestCase
      */
     public function testBasic()
     {
-        $object = new Pagination('25', 30.0, ['foo' => false, 'bar' => true]);
+        $object = new Pagination(25, 30, ['foo' => false, 'bar' => true]);
         $this->assertSame(25, $object->getMax());
         $this->assertSame(30, $object->getOffset());
         $this->assertEquals(['foo' => false, 'bar' => true], $object->getOrder());
@@ -40,7 +41,7 @@ class PaginationTest extends \PHPUnit_Framework_TestCase
      */
     public function testBad()
     {
-        $object = new Pagination('foobar', -1, ['  ' => 'aoeu', 'bar' => 1, 'baz' => 'yes']);
+        $object = new Pagination(PHP_INT_MAX, -1, ['  ' => 'aoeu', 'bar' => 1, 'baz' => 'yes']);
         $this->assertSame(PHP_INT_MAX, $object->getMax());
         $this->assertSame(0, $object->getOffset());
         $this->assertEquals(['bar' => false, 'baz' => false], $object->getOrder());

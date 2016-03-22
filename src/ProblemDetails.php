@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -18,6 +19,8 @@
  * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
  */
 namespace Caridea\Http;
+
+use Psr\Http\Message\UriInterface;
 
 /**
  * An implementation of Problem Details for HTTP APIs.
@@ -55,7 +58,7 @@ class ProblemDetails
      */
     protected $instance;
     /**
-     * @var array Map of `string` names to `mixed` values
+     * @var array<string,mixed> Map of `string` names to `mixed` values
      */
     protected $extensions = [];
     /**
@@ -80,15 +83,15 @@ class ProblemDetails
      * @param \Psr\Http\Message\UriInterface $instance An absolute URI that identifies the specific occurrence of the problem
      * @param array $extensions Additional members to the ProblemDetails
      */
-    public function __construct(\Psr\Http\Message\UriInterface $type = null, $title = null, $status = 0, $detail = null, \Psr\Http\Message\UriInterface $instance = null, array $extensions = [])
+    public function __construct(UriInterface $type = null, string $title = null, int $status = 0, string $detail = null, \Psr\Http\Message\UriInterface $instance = null, array $extensions = [])
     {
         $this->type = $type;
         $this->title = $title;
-        $this->status = (int)$status;
+        $this->status = $status;
         $this->detail = $detail;
         $this->instance = $instance;
         array_walk($extensions, function ($v, $k) {
-            if (!preg_match(self::REGEX_NAMES, $k) || property_exists($this, $k)) {
+            if (!preg_match(self::REGEX_NAMES, (string) $k) || property_exists($this, (string) $k)) {
                 throw new \InvalidArgumentException("Invalid extension name: '$k'");
             }
         });
@@ -98,7 +101,7 @@ class ProblemDetails
     /**
      * Gets the absolute URI that identifies the problem type
      *
-     * @return \Psr\Http\Message\UriInterface The problem type URI (or null)
+     * @return \Psr\Http\Message\UriInterface|null The problem type URI (or null)
      */
     public function getType()
     {
@@ -120,7 +123,7 @@ class ProblemDetails
      *
      * @return int The status code
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -138,7 +141,7 @@ class ProblemDetails
     /**
      * Gets the absolute URI that identifies the specific occurrence of the problem.
      *
-     * @return \Psr\Http\Message\UriInterface The URI that identifies the specific occurrence of the problem (or null)
+     * @return \Psr\Http\Message\UriInterface|null The URI that identifies the specific occurrence of the problem (or null)
      */
     public function getInstance()
     {
@@ -150,7 +153,7 @@ class ProblemDetails
      *
      * @return array Any extension members, never null.
      */
-    public function getExtensions()
+    public function getExtensions(): array
     {
         return $this->extensions;
     }
@@ -160,7 +163,7 @@ class ProblemDetails
      *
      * @return string The JSON representation
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toJson();
     }
@@ -170,7 +173,7 @@ class ProblemDetails
      *
      * @return string The JSON representation
      */
-    public function toJson()
+    public function toJson(): string
     {
         return json_encode($this->toArray());
     }
@@ -178,9 +181,9 @@ class ProblemDetails
     /**
      * Gets a serializable representation of this problem.
      *
-     * @return array This problem detail as an associative array
+     * @return array<string,mixed> This problem detail as an associative array
      */
-    public function toArray()
+    public function toArray(): array
     {
         if (empty($this->output)) {
             $problem = [

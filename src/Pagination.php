@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * Caridea
  *
@@ -36,7 +37,7 @@ class Pagination
      */
     protected $offset;
     /**
-     * @var array Associative array of field names to boolean values
+     * @var array<string,bool> Associative array of field names to boolean values
      */
     protected $order = [];
     
@@ -50,9 +51,9 @@ class Pagination
      *
      * @param int $max The max number of records to return. If zero or any negative number is provided, this defaults to `PHP_INT_MAX`
      * @param int $offset The offset in the records. If a negative number is provided, this defaults to `0`
-     * @param array $order Associative array of field names to boolean values (`true` = ascending, `false` = descending). Any non-boolean value (`1` included) will evaluate as `false`.
+     * @param array<string,bool> $order Associative array of field names to boolean values (`true` = ascending, `false` = descending). Any non-boolean value (`1` included) will evaluate as `false`.
      */
-    public function __construct($max, $offset, $order = [])
+    public function __construct(int $max, int $offset, $order = [])
     {
         $this->max = $this->normalize($max, PHP_INT_MAX);
         $this->offset = $this->normalize($offset, 0);
@@ -63,10 +64,9 @@ class Pagination
         }
     }
     
-    private function normalize($value, $default)
+    private function normalize(int $value, int $default): int
     {
-        $v = (int)$value;
-        return $v < 1 ? $default : $v;
+        return $value < 1 ? $default : $value;
     }
     
     /**
@@ -74,7 +74,7 @@ class Pagination
      *
      * @return int The max number of records to return
      */
-    public function getMax()
+    public function getMax(): int
     {
         return $this->max;
     }
@@ -84,7 +84,7 @@ class Pagination
      *
      * @return int The offset in the records
      */
-    public function getOffset()
+    public function getOffset(): int
     {
         return $this->offset;
     }
@@ -94,9 +94,9 @@ class Pagination
      *
      * Array keys are field names, values are `true` for ascending, `false` for descending.
      *
-     * @return array The field order
+     * @return array<string,bool> The field order
      */
-    public function getOrder()
+    public function getOrder(): array
     {
         return $this->order;
     }
