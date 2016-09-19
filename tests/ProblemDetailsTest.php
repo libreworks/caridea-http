@@ -30,6 +30,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      * @covers Caridea\Http\ProblemDetails::__construct
      * @covers Caridea\Http\ProblemDetails::toArray
      * @covers Caridea\Http\ProblemDetails::toJson
+     * @covers Caridea\Http\ProblemDetails::jsonSerialize
      */
     public function testGetType()
     {
@@ -41,6 +42,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($uri, $object->getType());
         $this->assertEquals(['type' => 'http://example.com/foo'], $object->toArray());
         $this->assertEquals('{"type":"http:\/\/example.com\/foo"}', $object->toJson());
+        $this->assertEquals('{"type":"http:\/\/example.com\/foo"}', json_encode($object));
     }
 
     /**
@@ -48,6 +50,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      * @covers Caridea\Http\ProblemDetails::__construct
      * @covers Caridea\Http\ProblemDetails::toArray
      * @covers Caridea\Http\ProblemDetails::toJson
+     * @covers Caridea\Http\ProblemDetails::jsonSerialize
      */
     public function testGetTitle()
     {
@@ -55,6 +58,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('A problem has occurred', $object->getTitle());
         $this->assertEquals(['type' => 'about:blank', 'title' => 'A problem has occurred'], $object->toArray());
         $this->assertEquals('{"type":"about:blank","title":"A problem has occurred"}', $object->toJson());
+        $this->assertEquals('{"type":"about:blank","title":"A problem has occurred"}', json_encode($object));
     }
 
     /**
@@ -62,6 +66,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
      * @covers Caridea\Http\ProblemDetails::__construct
      * @covers Caridea\Http\ProblemDetails::toArray
      * @covers Caridea\Http\ProblemDetails::toJson
+     * @covers Caridea\Http\ProblemDetails::jsonSerialize
      */
     public function testGetStatus()
     {
@@ -70,6 +75,7 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(404, $object->getStatus());
         $this->assertEquals(['type' => 'about:blank', 'status' => 404], $object->toArray());
         $this->assertEquals('{"type":"about:blank","status":404}', $object->toJson());
+        $this->assertEquals('{"type":"about:blank","status":404}', json_encode($object));
     }
 
     /**
@@ -138,5 +144,23 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
     public function testBadExtensions2()
     {
         new ProblemDetails(null, null, 0, null, null, [911 => 'emergency']);
+    }
+
+    /**
+     * @covers Caridea\Http\ProblemDetails::send
+     */
+    public function testSend()
+    {
+        $object = new ProblemDetails(null, 'A problem has occurred');
+        $json = '{"type":"about:blank","title":"A problem has occurred"}';
+        $response = $this->getMock(\Psr\Http\Message\ResponseInterface::class);
+        $body = $this->getMock(\Psr\Http\Message\StreamInterface::class);
+        $body->expects($this->once())->method('write')->with($this->equalTo($json));
+        $response->expects($this->once())->method('getBody')->willReturn($body);
+        $response->expects($this->once())->method('withHeader')
+            ->with($this->equalTo('Content-Type'), $this->equalTo(ProblemDetails::MIME_TYPE_JSON))
+            ->willReturn($response);
+        $this->assertSame($response, $object->send($response));
+        $this->verifyMockObjects();
     }
 }

@@ -21,22 +21,20 @@ declare(strict_types=1);
 namespace Caridea\Http;
 
 use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
- * An implementation of Problem Details for HTTP APIs.
- *
- * Unfortunately, the specific draft of the memo is expired as of March.
- * Hopefully a new version will be released soon.
+ * An implementation of RFC 7807, Problem Details for HTTP APIs.
  *
  * @copyright 2015-2016 LibreWorks contributors
  * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
- * @see https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00
+ * @see https://tools.ietf.org/html/rfc7807
  */
-class ProblemDetails
+class ProblemDetails implements \JsonSerializable
 {
     const MIME_TYPE_JSON = 'application/problem+json';
     const REGEX_NAMES = '/^[a-z][a-z0-9_]{2,}$/i';
-    
+
     /**
      * @var \Psr\Http\Message\UriInterface An absolute URI that identifies the problem type
      */
@@ -97,7 +95,7 @@ class ProblemDetails
         });
         $this->extensions = $extensions;
     }
-    
+
     /**
      * Gets the absolute URI that identifies the problem type
      *
@@ -204,5 +202,27 @@ class ProblemDetails
             $this->output = array_merge($problem, $this->extensions);
         }
         return $this->output;
+    }
+
+    /**
+     * Returns the JSON representation.
+     *
+     * @return array<string,mixed> This problem detail as an associative array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    /**
+     * Adds this problem detail to a PSR-7 HTTP response.
+     *
+     * @param ResponseInterface $response The HTTP response
+     * @return ResponseInterface The new response
+     */
+    public function send(ResponseInterface $response): ResponseInterface
+    {
+        $response->getBody()->write(json_encode($this->toArray()));
+        return $response->withHeader('Content-Type', self::MIME_TYPE_JSON);
     }
 }

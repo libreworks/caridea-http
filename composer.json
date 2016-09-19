@@ -2,7 +2,7 @@
     "name": "caridea/http",
     "type": "library",
     "description": "A shrimp of an HTTP utility library",
-    "keywords": ["http", "problem details"],
+    "keywords": ["http", "problem details", "rfc7807", "rfc 7807"],
     "homepage": "http://github.com/libreworks/caridea-http",
     "license": "Apache-2.0",
     "authors": [

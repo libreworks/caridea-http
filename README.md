@@ -5,11 +5,12 @@ Caridea is a miniscule PHP application library. This shrimpy fellow is what you'
 
 This is its HTTP component. It includes small utilities for working with [PSR-7](http://www.php-fig.org/psr/psr-7/) HTTP requests and responses, including:
 
-* An implementation of "[Problem Details for HTTP APIs](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00)".
+* An implementation of RFC 7807, "[Problem Details for HTTP APIs](https://tools.ietf.org/html/rfc7807)".
 * A utility to parse common pagination parameters from the request
 * A utility to correctly parse query strings with multiple parameters having the same name
 * A utility to determine a client's preferred accepted MIME type
 
+[![Packagist](https://img.shields.io/packagist/v/caridea/http.svg)](https://packagist.org/packages/caridea/http)
 [![Build Status](https://travis-ci.org/libreworks/caridea-http.svg)](https://travis-ci.org/libreworks/caridea-http)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
@@ -39,6 +40,9 @@ Just a few quick examples.
 
 ### Problem Details
 
+We included an implementation of RFC 7807 that you can serialize to JSON or
+append to a PSR-7 HTTP Response.
+
 ```php
 use Caridea\Http\ProblemDetails;
 use Zend\Diactoros\Uri;
@@ -54,7 +58,8 @@ $problem = new ProblemDetails(
         'auth' => 'foobar'
     ]
 );
-echo $problem->toJson();
+echo json_encode($problem);
+
 ```
 
 ### Pagination Factory
