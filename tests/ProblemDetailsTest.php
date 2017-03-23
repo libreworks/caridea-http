@@ -153,8 +153,8 @@ class ProblemDetailsTest extends \PHPUnit_Framework_TestCase
     {
         $object = new ProblemDetails(null, 'A problem has occurred');
         $json = '{"type":"about:blank","title":"A problem has occurred"}';
-        $response = $this->getMock(\Psr\Http\Message\ResponseInterface::class);
-        $body = $this->getMock(\Psr\Http\Message\StreamInterface::class);
+        $response = $this->createMock(\Psr\Http\Message\ResponseInterface::class);
+        $body = $this->createMock(\Psr\Http\Message\StreamInterface::class);
         $body->expects($this->once())->method('write')->with($this->equalTo($json));
         $response->expects($this->once())->method('getBody')->willReturn($body);
         $response->expects($this->once())->method('withHeader')

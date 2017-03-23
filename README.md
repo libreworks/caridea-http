@@ -90,3 +90,11 @@ $pagination->getOrder();  // ['foo' => true, 'bar' => false]
 $types = new \Caridea\Http\AcceptTypes($_SERVER);
 $types->preferred(['application/xml', 'application/json']); // returns application/xml
 ```
+
+### Helper Traits
+
+Two traits are now available, `JsonHelper` and `MessageHelper`. These can be used by controller classes or dispatcher middleware.
+
+## Third-Party
+
+The traits `JsonHelper` and `MessageHelper` (as well as their unit tests) were ported to PHP from the Labrys library under a compatible Apache 2.0 license.
