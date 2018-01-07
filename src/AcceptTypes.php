@@ -15,16 +15,16 @@ declare(strict_types=1);
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * @copyright 2015-2016 LibreWorks contributors
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @copyright 2015-2018 LibreWorks contributors
+ * @license   Apache-2.0
  */
 namespace Caridea\Http;
 
 /**
  * Provides utilities for working with the HTTP Accept header.
  *
- * @copyright 2015-2016 LibreWorks contributors
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @copyright 2015-2018 LibreWorks contributors
+ * @license   Apache-2.0
  */
 class AcceptTypes
 {
@@ -48,7 +48,7 @@ class AcceptTypes
             }
         }
     }
-    
+
     /**
      * Returns the most preferred MIME type out of the provided list.
      *
@@ -74,7 +74,7 @@ class AcceptTypes
      * @param string[] $types The MIME types to compare
      * @return string|null The most preferred MIME type or null
      */
-    public function preferred(array $types)
+    public function preferred(array $types): ?string
     {
         if (empty($types)) {
             return null;
@@ -94,5 +94,6 @@ class AcceptTypes
                 }
             }
         }
+        return null;
     }
 }

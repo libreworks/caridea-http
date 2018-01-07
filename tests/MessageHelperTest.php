@@ -16,12 +16,12 @@ declare(strict_types=1);
  * the License.
  *
  * @copyright 2015-2017 Appertly
- * @copyright 2017 LibreWorks contributors
+ * @copyright 2017-2018 LibreWorks contributors
  * @license   Apache-2.0
  */
 namespace Caridea\Http;
 
-class MessageHelperTest extends \PHPUnit_Framework_TestCase
+class MessageHelperTest extends \PHPUnit\Framework\TestCase
 {
     use MessageHelper;
 

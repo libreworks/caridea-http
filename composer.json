@@ -2,7 +2,7 @@
     "name": "caridea/http",
     "type": "library",
     "description": "A shrimp of an HTTP utility library",
-    "keywords": ["http", "problem details", "rfc7807", "rfc 7807"],
+    "keywords": ["http", "problem details", "rfc7807", "rfc 7807", "mime"],
     "homepage": "http://github.com/libreworks/caridea-http",
     "license": "Apache-2.0",
     "authors": [
@@ -12,11 +12,11 @@
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.1.0",
         "psr/http-message": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.2.0",
+        "phpunit/phpunit": "^6.0.0",
         "zendframework/zend-diactoros": "^1.0"
     },
     "autoload": {

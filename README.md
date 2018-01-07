@@ -15,8 +15,6 @@ This is its HTTP component. It includes small utilities for working with [PSR-7]
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
 
-We've also included `.hhi` files for the Hack typechecker.
-
 ## Installation
 
 You can install this library using Composer:
@@ -25,7 +23,8 @@ You can install this library using Composer:
 $ composer require caridea/http
 ```
 
-* The master branch (version 2.x) of this project requires PHP 7.0 and depends on `psr/http-message`.
+* The master branch (version 3.x) of this project requires PHP 7.1 and depends on `psr/http-message`.
+* Version 2.x of this project requires PHP 7.0 and depends on `psr/http-message`.
 * Version 1.x of this project requires PHP 5.5 and depends on `psr/http-message`.
 
 ## Compliance

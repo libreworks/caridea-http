@@ -15,16 +15,16 @@ declare(strict_types=1);
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * @copyright 2015-2016 LibreWorks contributors
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @copyright 2015-2018 LibreWorks contributors
+ * @license   Apache-2.0
  */
 namespace Caridea\Http;
 
 /**
  * Container for pagination information (i.e. items per page, item offset, field sort order)
  *
- * @copyright 2015-2016 LibreWorks contributors
- * @license   http://opensource.org/licenses/Apache-2.0 Apache 2.0 License
+ * @copyright 2015-2018 LibreWorks contributors
+ * @license   Apache-2.0
  */
 class Pagination
 {
