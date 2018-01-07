@@ -14,6 +14,7 @@ This is its HTTP component. It includes small utilities for working with [PSR-7]
 [![Build Status](https://travis-ci.org/libreworks/caridea-http.svg)](https://travis-ci.org/libreworks/caridea-http)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/libreworks/caridea-http/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/libreworks/caridea-http/?branch=master)
+[![Documentation Status](http://readthedocs.org/projects/caridea-http/badge/?version=latest)](http://caridea-http.readthedocs.io/en/latest/?badge=latest)
 
 ## Installation
 
@@ -32,6 +33,10 @@ $ composer require caridea/http
 Releases of this library will conform to [Semantic Versioning](http://semver.org).
 
 Our code is intended to comply with [PSR-1](http://www.php-fig.org/psr/psr-1/), [PSR-2](http://www.php-fig.org/psr/psr-2/), and [PSR-4](http://www.php-fig.org/psr/psr-4/). If you find any issues related to standards compliance, please send a pull request!
+
+## Documentation
+
+* Head over to [Read the Docs](http://caridea-http.readthedocs.io/en/latest/)
 
 ## Examples
 
