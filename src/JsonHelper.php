@@ -46,12 +46,12 @@ trait JsonHelper
      * Sends a Content-Range header for pagination.
      *
      * @param \Psr\Http\Message\ResponseInterface $response  The response
-     * @param \Traversable|array $items  The items to serialize
-     * @param \Caridea\Http\Pagination $pagination  The pagination object
-     * @param int $total  The total number of records, if `$items` is a subset
+     * @param iterable $items  The items to serialize
+     * @param \Caridea\Http\Pagination|null $pagination  The pagination object
+     * @param int|null $total  The total number of records, if `$items` is a subset
      * @return \Psr\Http\Message\ResponseInterface  The JSON response
      */
-    protected function sendItems(Response $response, $items, Pagination $pagination = null, int $total = null): Response
+    protected function sendItems(Response $response, iterable $items, ?Pagination $pagination = null, ?int $total = null): Response
     {
         $items = is_array($items) ? $items : ($items instanceof \Traversable ? iterator_to_array($items, false) : []);
         $total = $total ?? count($items);
